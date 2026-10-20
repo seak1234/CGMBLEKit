@@ -15,7 +15,7 @@ public protocol TransmitterManagerObserver: AnyObject {
 }
 
 
-public class TransmitterManager: TransmitterDelegate {
+public class TransmitterManager: TransmitterDelegate, CGMSensorLifecycleProviding {
 
     var state: TransmitterManagerState {
         get {
@@ -70,6 +70,12 @@ public class TransmitterManager: TransmitterDelegate {
         return false
     }
     
+    public var sensorLifecycle: CGMSensorLifecycle? {
+        guard let start = latestReading?.sessionStartDate else { return nil }
+        let end = start.addingTimeInterval(state.sensorLife)
+        return CGMSensorLifecycle(startDate: start, nominalExpirationDate: end, sessionEndDate: end, warmupEndDate: nil)
+    }
+
     public var cgmManagerStatus: CGMManagerStatus {
         return CGMManagerStatus(hasValidSensorSession: hasValidSensorSession, device: device)
     }
